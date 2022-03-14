@@ -1,6 +1,6 @@
 
 /* Валюты, которыми мы будем оперировать */
-create table currency  (
+create table IF NOT EXISTS currency  (
 	id int NOT NULL AUTO_INCREMENT,
 	s_title string not null,
 	mark string(3) not null,
@@ -8,7 +8,7 @@ create table currency  (
 );
 
 /* Курс валюты к рублю на определенную дату */
-create table currency_cource (
+create table IF NOT EXISTS currency_cource (
 	currency int not null,
 	`date` date not null,
 	src enum('market', 'cb', 'other') not null,
@@ -20,7 +20,7 @@ create table currency_cource (
 );
 
 /* Метрики, которые мы будем собирать */
-create table metrics (
+create table IF NOT EXISTS metrics (
 	id int NOT NULL AUTO_INCREMENT,
 	s_title string not null,
 	period enum('year', 'month', 'week', 'day', 'other') not null,
@@ -35,7 +35,7 @@ create table metrics (
 );
 
 /* Собранные по метрикам данные */
-create table metric (
+create table IF NOT EXISTS metric (
 	id int NOT NULL AUTO_INCREMENT,
 	metric int not null,
 	date_described DATETIME not null, /* дата, которую описывают данные */
@@ -51,7 +51,7 @@ create table metric (
 
 /*	Иерархия показателей. Строго говоря, это скорей должно принадлежать отчету,
 	но с вероятностью ~100% оно от отчета к отчету меняться не будет. */
-create table metrics_hirarchy (
+create table IF NOT EXISTS metrics_hirarchy (
 	id int NOT NULL AUTO_INCREMENT,
 	s_title string not null,
 	metric int,
