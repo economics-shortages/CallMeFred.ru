@@ -2,7 +2,7 @@
 /* Валюты, которыми мы будем оперировать */
 create table currency  (
 	id int NOT NULL AUTO_INCREMENT,
-	title string not null,
+	s_title string not null,
 	mark string(3) not null,
 	PRIMARY KEY (id)
 );
@@ -22,13 +22,12 @@ create table currency_cource (
 /* Метрики, которые мы будем собирать */
 create table metrics (
 	id int NOT NULL AUTO_INCREMENT,
-	string title not null,
-	pariod enum('year', 'month', 'week', 'day', 'other') not null,
-	divide_by int not null, /* хинт для отображения, а хранить будем тупо сырое целое */
+	s_title string not null,
+	period enum('year', 'month', 'week', 'day', 'other') not null,
 	currency int external key currency(id) not null,
 	last_ok_parse DATETIME,
 	last_fail_parse DATETIME,
-	last_parse_error TEXT,
+	s_last_parse_error TEXT,
 	PRIMARY KEY (id),
 	FOREIGN KEY (currency)
       REFERENCES currency(id)
@@ -45,6 +44,18 @@ create table metric (
 	obsolete bool not null, /*	false для старых данных, по которым новая выгрузка даёт нам новое значение. При этом старое значение останется
 								в БД, но с obsolete = true. */
 	PRIMARY KEY (id),
+	FOREIGN KEY (metric)
+      REFERENCES metrics(id)
+      ON UPDATE RESTRICT ON DELETE RESTRICT
+);
+
+/*	Иерархия показателей. Строго говоря, это скорей должно принадлежать отчету,
+	но с вероятностью ~100% оно от отчета к отчету меняться не будет. */
+create table metrics_hirarchy (
+	id int NOT NULL AUTO_INCREMENT,
+	s_title string not null,
+	metric int,
+	parent int,
 	FOREIGN KEY (metric)
       REFERENCES metrics(id)
       ON UPDATE RESTRICT ON DELETE RESTRICT
