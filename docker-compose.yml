@@ -1,0 +1,66 @@
+version: "3.6"
+
+services:
+  chrome:
+    image: selenium/node-chrome:${SE_VERSION}
+    shm_size: ${SE_SHARED_MEMORY}
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=${CN_SE_HUB}
+      - SE_EVENT_BUS_PUBLISH_PORT=${SE_EVENT_BUS_PUBLISH_PORT}
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=${SE_EVENT_BUS_SUBSCRIBE_PORT}
+  edge:
+    image: selenium/node-edge:${SE_VERSION}
+    shm_size: ${SE_SHARED_MEMORY}
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=${CN_SE_HUB}
+      - SE_EVENT_BUS_PUBLISH_PORT=${SE_EVENT_BUS_PUBLISH_PORT}
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=${SE_EVENT_BUS_SUBSCRIBE_PORT}
+
+  selenium-hub:
+    image: selenium/hub:${SE_VERSION}
+    container_name: ${CN_SE_HUB}
+    ports:
+      - "${SE_EVENT_BUS_PUBLISH_PORT}:4442"
+      - "${SE_EVENT_BUS_SUBSCRIBE_PORT}:4443"
+      - "${SE_WEB_PORT}:4444"
+
+  database:
+    image: mysql:8
+    restart: always
+    ports:
+      - "${MYSQL_SHARED_PORT}:3306"
+    expose:
+      - "${MYSQL_SHARED_PORT}"
+    volumes:
+      - './.mysql-data/db:/var/lib/mysql'
+    environment:
+      # Alow root from any IP
+      # MYSQL_ROOT_HOST: '%' 
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+  code:
+    container_name: ${CN_CODE}
+    command: tail -f /dev/null
+    build:
+      context: ./source
+    environment:
+      - CN_SE_HUB=${CN_SE_HUB}
+      - SE_WEB_PORT=${SE_WEB_PORT}
+      - MYSQL_HOST=database
+      - MYSQL_PORT=${MYSQL_SHARED_PORT}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ./source:/app
+    depends_on:
+      - database
+      - chrome
+      - edge
+      - selenium-hub
