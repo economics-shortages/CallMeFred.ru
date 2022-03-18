@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS metric (
 
 /*	Иерархия показателей. Строго говоря, это скорей должно принадлежать отчету,
 	но с вероятностью ~100% оно от отчета к отчету меняться не будет. */
-CREATE TABLE IF NOT EXISTS metrics_hirarchy (
+CREATE TABLE IF NOT EXISTS metrics_hierarchy (
 	id INT NOT NULL AUTO_INCREMENT,
 	s_title VARCHAR(255) NOT NULL,
 	metric INT,
