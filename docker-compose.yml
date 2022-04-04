@@ -61,6 +61,7 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - ./source:/app
+      - ./data:/app_data
     depends_on:
       - database
       - chrome
